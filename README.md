@@ -16,8 +16,8 @@
 ### 本地安装
 ```bash
 # 克隆项目
-git clone <repository-url>
-cd password
+gcl git@github.com:Jack-sh1/paw.git
+cd paw 
 
 # 安装依赖
 npm install
@@ -72,13 +72,13 @@ paw 12 --no-copy
 ### 查看使用示例
 
 ```bash
-node index.js examples
+paw examples
 ```
 
 ### 查看帮助
 
 ```bash
-node index.js --help
+paw -h 
 ```
 
 ## 🎯 命令选项
@@ -96,7 +96,7 @@ node index.js --help
 
 ```bash
 # 示例1: 生成默认12位密码
-$ node index.js
+$ paw
 🔐 生成的密码:
 📋 aB3$kL9@mN2!
 📏 长度: 12 位
@@ -104,7 +104,7 @@ $ node index.js
 ✅ 密码已复制到剪贴板!
 
 # 示例2: 生成16位纯字母密码
-$ node index.js 16 --no-numbers --no-symbols
+$ paw 16 --no-numbers --no-symbols
 🔐 生成的密码:
 📋 aBcDeFgHiJkLmNoP
 📏 长度: 16 位
@@ -112,7 +112,7 @@ $ node index.js 16 --no-numbers --no-symbols
 ✅ 密码已复制到剪贴板!
 
 # 示例3: 生成8位密码，不包含特殊符号
-$ node index.js 8 --no-symbols
+$ paw 8 --no-symbols
 🔐 生成的密码:
 📋 aB3kL9mN
 📏 长度: 8 位
