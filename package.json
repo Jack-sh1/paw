@@ -1,0 +1,26 @@
+{
+  "name": "password-generator-cli",
+  "version": "0.0.1",
+  "description": "一个简单而强大的命令行密码生成器",
+  "main": "index.js",
+  "bin": {
+    "paw": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "password",
+    "generator",
+    "cli",
+    "security",
+    "random"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "clipboardy": "^5.0.0",
+    "commander": "^14.0.2"
+  }
+}
