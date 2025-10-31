@@ -2,8 +2,61 @@
 
 const { Command } = require('commander');
 const clipboardy = require('clipboardy');
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
 
 const program = new Command();
+
+// 历史记录文件路径
+const HISTORY_FILE = path.join(os.homedir(), '.password-generator-history.json');
+
+// 历史记录管理函数
+function loadHistory() {
+  try {
+    if (fs.existsSync(HISTORY_FILE)) {
+      const data = fs.readFileSync(HISTORY_FILE, 'utf8');
+      return JSON.parse(data);
+    }
+  } catch (error) {
+    console.warn('⚠️  读取历史记录失败，将创建新的历史记录');
+  }
+  return [];
+}
+
+function saveHistory(history) {
+  try {
+    fs.writeFileSync(HISTORY_FILE, JSON.stringify(history, null, 2));
+  } catch (error) {
+    console.warn('⚠️  保存历史记录失败:', error.message);
+  }
+}
+
+function addToHistory(password, length, includeNumbers, includeSymbols) {
+  const history = loadHistory();
+  const entry = {
+    password,
+    length,
+    includeNumbers,
+    includeSymbols,
+    timestamp: new Date().toISOString(),
+    components: []
+  };
+  
+  // 记录密码组成
+  entry.components.push('字母');
+  if (includeNumbers) entry.components.push('数字');
+  if (includeSymbols) entry.components.push('特殊符号');
+  
+  history.unshift(entry); // 添加到开头
+  
+  // 限制历史记录数量为50条
+  if (history.length > 50) {
+    history.splice(50);
+  }
+  
+  saveHistory(history);
+}
 
 // 密码生成函数
 function generatePassword(length, includeNumbers, includeSymbols) {
@@ -33,7 +86,7 @@ function generatePassword(length, includeNumbers, includeSymbols) {
 program
   .name('password-generator')
   .description('一个简单而强大的密码生成器')
-  .version('0.0.1');
+  .version('0.0.2');
 
 // 主命令
 program
@@ -84,6 +137,9 @@ program
         }
       }
       
+      // 保存到历史记录
+      addToHistory(password, length, includeNumbers, includeSymbols);
+      
       console.log('');
       
     } catch (error) {
@@ -117,6 +173,84 @@ program
     console.log('  # 生成只包含字母的密码');
     console.log('  $ password-generator 10 --no-numbers --no-symbols');
     console.log('');
+  });
+
+// 历史记录命令
+program
+  .command('history')
+  .description('查看密码生成历史记录')
+  .option('-n, --number <count>', '显示的历史记录数量', '10')
+  .action((options) => {
+    try {
+      const history = loadHistory();
+      const count = parseInt(options.number);
+      
+      if (history.length === 0) {
+        console.log('\n📝 暂无历史记录');
+        console.log('💡 生成密码后会自动保存到历史记录中\n');
+        return;
+      }
+      
+      const displayCount = Math.min(count, history.length);
+      console.log(`\n📝 最近 ${displayCount} 条密码生成记录:\n`);
+      
+      for (let i = 0; i < displayCount; i++) {
+        const entry = history[i];
+        const date = new Date(entry.timestamp);
+        const timeStr = date.toLocaleString('zh-CN', {
+          year: 'numeric',
+          month: '2-digit',
+          day: '2-digit',
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit'
+        });
+        
+        console.log(`${i + 1}. 🔐 ${entry.password}`);
+        console.log(`   📏 长度: ${entry.length} 位`);
+        console.log(`   🧩 包含: ${entry.components.join(', ')}`);
+        console.log(`   🕒 时间: ${timeStr}`);
+        console.log('');
+      }
+      
+      if (history.length > displayCount) {
+        console.log(`💡 还有 ${history.length - displayCount} 条历史记录，使用 -n ${history.length} 查看全部\n`);
+      }
+      
+    } catch (error) {
+      console.error('❌ 读取历史记录失败:', error.message);
+    }
+  });
+
+// 清除历史记录命令
+program
+  .command('clear-history')
+  .description('清除所有历史记录')
+  .option('-y, --yes', '跳过确认直接清除')
+  .action(async (options) => {
+    try {
+      const history = loadHistory();
+      
+      if (history.length === 0) {
+        console.log('\n📝 历史记录已经是空的\n');
+        return;
+      }
+      
+      if (!options.yes) {
+        // 简单的确认机制
+        console.log(`\n⚠️  即将清除 ${history.length} 条历史记录`);
+        console.log('💡 如果确认清除，请重新运行命令并添加 -y 参数:');
+        console.log('   paw clear-history -y\n');
+        return;
+      }
+      
+      // 清除历史记录
+      saveHistory([]);
+      console.log('\n✅ 历史记录已清除\n');
+      
+    } catch (error) {
+      console.error('❌ 清除历史记录失败:', error.message);
+    }
   });
 
 // 解析命令行参数

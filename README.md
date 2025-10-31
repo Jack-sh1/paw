@@ -28,7 +28,7 @@ npm link
 
 ### 全局安装（如果发布到 npm）
 ```bash
-npm install -g password-generator-cli
+npm install -g paw
 ```
 
 ## 📖 使用方法
@@ -40,34 +40,33 @@ npm install -g password-generator-cli
 node index.js
 
 # 或者如果已全局安装
-password-generator
-pwgen  # 简短别名
+paw # 简短别名
 ```
 
 ### 指定密码长度
 
 ```bash
 # 生成16位密码
-node index.js 16
+paw 16
 
 # 生成8位密码
-node index.js 8
+paw 8
 ```
 
 ### 自定义密码组成
 
 ```bash
 # 生成不包含数字的密码
-node index.js 12 --no-numbers
+paw 12 --no-numbers
 
 # 生成不包含特殊符号的密码
-node index.js 12 --no-symbols
+paw 12 --no-symbols
 
 # 生成只包含字母的密码
-node index.js 12 --no-numbers --no-symbols
+paw 12 --no-numbers --no-symbols
 
 # 生成密码但不复制到剪贴板
-node index.js 12 --no-copy
+paw 12 --no-copy
 ```
 
 ### 查看使用示例
@@ -139,6 +138,11 @@ $ node index.js 8 --no-symbols
 - 支持最长128位密码
 - 字符集可自定义组合
 - 不存储或记录生成的密码
+
+## 产品迭代
+
+- 0.0.1 初始版本，基本功能实现
+- 0.0.2 新增命令行参数 `--no-copy`，用于生成密码但不复制到剪贴板
 
 ## 🤝 贡献
 
